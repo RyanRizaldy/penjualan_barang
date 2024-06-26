@@ -4,7 +4,12 @@
  * and open the template in the editor.
  */
 package penjualan_barang;
-
+import java.awt.Desktop;
+import java.net.URL;
+import java.sql.*;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.awt.event.KeyEvent;
 /**
  *
  * @author PC
@@ -14,9 +19,110 @@ public class fpenjualan extends javax.swing.JFrame {
     /**
      * Creates new form fpenjualan
      */
+    private DefaultTableModel model;
+    public long total;
+    public long bayar;
+    public long kembali;
+    public Statement st;
+    Connection cn = Koneksi.getKoneksi();
+ 
     public fpenjualan() {
         initComponents();
+    model = new DefaultTableModel();
+    
+    tabel.setModel(model);
+    model.addColumn("ID");
+    model.addColumn("kode barang");
+    model.addColumn("nama barang");
+    model.addColumn("harga satuan");
+    model.addColumn("jumlah beli");
+    model.addColumn("harga");
+    loadData();
+    nofaktur();
+    tampilpilih(); 
     }
+public void FilterHuruf(KeyEvent a){
+ if(Character.isDigit(a.getKeyChar())){
+ a.consume();
+ JOptionPane.showMessageDialog(null, "masukan huruf saja!", "peringatan", 
+JOptionPane.WARNING_MESSAGE);
+ }
+ }
+ public void FilterAngka(KeyEvent a){
+ if(Character.isAlphabetic(a.getKeyChar())){
+ a.consume();
+ JOptionPane.showMessageDialog(null, "masukan angka saja!", "peringatan", 
+JOptionPane.WARNING_MESSAGE);
+ }
+ }
+ public final void loadData() {
+ model.getDataVector().removeAllElements();
+ model.fireTableDataChanged();
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT * FROM tb_hitung_jual";
+ ResultSet r = s.executeQuery(sql);
+ while (r.next()) {
+ Object[] o = new Object[6];
+ o[0] = r.getString("id_tmp");
+ o[1] = r.getString("kode_barang");
+ o[2] = r.getString("nama_barang");
+ o[3] = r.getString("harga_satuan");
+ o[4] = r.getString("Jumlah_beli");
+ o[5] = r.getString("harga");
+ 
+ model.addRow(o);
+ }
+ r.close();
+ s.close();
+ } catch (SQLException e) {
+ System.out.println("Terjadi Error");
+ }
+ }
+private void tampilpilih() {
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT nama_barang FROM tb_barang WHERE jumlah_barang !='0'";
+ ResultSet r = s.executeQuery(sql);
+ while (r.next()) {
+ pilihbarang.addItem(r.getString("nama_barang"));
+ }
+ r.last();
+ int jumlahdata = r.getRow();
+ r.first();
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(null, e);
+ }
+ }
+ private void nofaktur() {
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT * FROM tb_penjualan ORDER by no_faktur desc";
+ ResultSet r = s.executeQuery(sql);
+ if (r.next()) {
+ String nofak = r.getString("no_faktur").substring(1);
+ String AN = "" + (Integer.parseInt(nofak) + 1);
+ String Nol = "";
+ if (AN.length() == 1) {
+ Nol = "000";
+ } else if (AN.length() == 2) {
+ Nol = "00";
+ } else if (AN.length() == 3) {
+ Nol = "0";
+ } else if (AN.length() == 4) {
+ Nol = "";
+ }
+ faktur.setText("F" + Nol + AN);
+ } else {
+ faktur.setText("F0001");
+ }
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(null, e);
+ }
+ }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,31 +136,31 @@ public class fpenjualan extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        bt_kembali = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
-        jTextField5 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
+        pilihbarang = new javax.swing.JComboBox<>();
+        faktur = new javax.swing.JTextField();
+        kode_barang = new javax.swing.JTextField();
+        harga_satuan = new javax.swing.JTextField();
+        Jumlah_jual = new javax.swing.JTextField();
+        hitung = new javax.swing.JButton();
+        text_total = new javax.swing.JTextField();
+        tambah = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        tabel = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
-        jButton4 = new javax.swing.JButton();
+        bt_total = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jTextField6 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
+        selesai = new javax.swing.JButton();
+        cetak = new javax.swing.JButton();
+        text_bayar = new javax.swing.JTextField();
+        text_kembalian = new javax.swing.JTextField();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -74,10 +180,10 @@ public class fpenjualan extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("Penjualan");
 
-        jButton1.setText("Kembali");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        bt_kembali.setText("Kembali");
+        bt_kembali.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                bt_kembaliActionPerformed(evt);
             }
         });
 
@@ -91,23 +197,13 @@ public class fpenjualan extends javax.swing.JFrame {
 
         jLabel6.setText("Jumlah jual");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        pilihbarang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
-        jTextField1.setText("jTextField1");
+        hitung.setText("Hitung");
 
-        jTextField2.setText("jTextField2");
+        tambah.setText("Tambah");
 
-        jTextField3.setText("jTextField2");
-
-        jTextField4.setText("jTextField2");
-
-        jButton2.setText("Hitung");
-
-        jTextField5.setText("jTextField5");
-
-        jButton3.setText("Tambah");
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        tabel.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -118,30 +214,26 @@ public class fpenjualan extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable2);
+        jScrollPane2.setViewportView(tabel);
 
         jPanel1.setBackground(new java.awt.Color(153, 153, 153));
 
         jLabel7.setText("RP");
 
-        jButton4.setText("Total");
+        bt_total.setText("Total");
 
         jLabel8.setText("Bayar");
 
         jLabel9.setText("Kembalian");
 
-        jButton5.setText("Selesai transaksi");
+        selesai.setText("Selesai transaksi");
 
-        jButton6.setText("Cetak");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        cetak.setText("Cetak");
+        cetak.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                cetakActionPerformed(evt);
             }
         });
-
-        jTextField6.setText("jTextField6");
-
-        jTextField7.setText("jTextField7");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -158,20 +250,20 @@ public class fpenjualan extends javax.swing.JFrame {
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel9)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(jTextField7))
+                                        .addComponent(text_kembalian))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addComponent(jLabel8)
                                         .addGap(38, 38, 38)
-                                        .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addComponent(text_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(56, 56, 56)
-                                .addComponent(jButton5)))
+                                .addComponent(selesai)))
                         .addGap(0, 36, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(bt_total, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cetak, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -180,19 +272,19 @@ public class fpenjualan extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4)
+                .addComponent(bt_total)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(text_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(text_kembalian, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
-                .addComponent(jButton5)
+                .addComponent(selesai)
                 .addGap(18, 18, 18)
-                .addComponent(jButton6)
+                .addComponent(cetak)
                 .addContainerGap())
         );
 
@@ -203,38 +295,38 @@ public class fpenjualan extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1))
+                .addComponent(bt_kembali))
             .addGroup(layout.createSequentialGroup()
                 .addGap(56, 56, 56)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField2))
+                        .addComponent(kode_barang))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1)
-                            .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(faktur)
+                            .addComponent(pilihbarang, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(84, 84, 84)
-                                .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(text_total, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(hitung, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(tambah, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel5)
                                     .addComponent(jLabel6))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextField3)
-                                    .addComponent(jTextField4))))
+                                    .addComponent(Jumlah_jual)
+                                    .addComponent(harga_satuan))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -246,35 +338,35 @@ public class fpenjualan extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jButton1))
+                    .addComponent(bt_kembali))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(faktur, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(pilihbarang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(kode_barang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(harga_satuan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
-                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(Jumlah_jual, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton2)
-                            .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(hitung)
+                            .addComponent(text_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3))
+                        .addComponent(tambah))
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -284,57 +376,354 @@ public class fpenjualan extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+ private void hsatuanActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ } 
+ private void pilihbarangActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ if (pilihbarang.getSelectedItem().equals("pilih barang")){
+ kode_barang.setText("");
+ harga_satuan.setText("");
+ }else{
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT kode_barang, jumlah_barang FROM tb_barang WHERE nama_barang ='" + 
+pilihbarang.getSelectedItem() + "'";
+ ResultSet r = s.executeQuery(sql);
+ while (r.next()) {
+ kode_barang.setText(r.getString("kode_barang"));
+ text_total.setText(r.getString("jumlah_barang"));
+ }
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(null, e);
+ }
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT harga_jual FROM tb_barang WHERE nama_barang ='" + 
+pilihbarang.getSelectedItem() + "'";
+ ResultSet r = s.executeQuery(sql);
+ while (r.next()) {
+ harga_satuan.setText(r.getString("harga_jual"));
+ }
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(null, e);
+ }
+ }
+ } 
+ private void hitungActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ if(faktur.getText().equals("") ||kode_barang.getText().equals("") || 
+pilihbarang.getSelectedItem().equals("")|| harga_satuan.getText().equals("")|| Jumlah_jual.getText().equals("")){
+ JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ 
+ }else{
+ String a = Jumlah_jual.getText();
+ int aa = Integer.parseInt(a);
+ 
+ String b = text_total.getText();
+ int bb = Integer.parseInt(b);
+ if(aa > bb){
+ JOptionPane.showMessageDialog(null, "jumlah melebihi stok", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ Jumlah_jual.setText("");
+ }else{
+ 
+ if(Jumlah_jual.getText().equals("")){
+ JOptionPane.showMessageDialog(null, "ISI JUMLAH BELI !");
+ }else{
+ int jumlah, harga, total;
+ 
+ jumlah = Integer.parseInt(Jumlah_jual.getText().toString());
+ harga = Integer.parseInt(harga_satuan.getText().toString());
+ total = jumlah * harga;
+ 
+ 
+ text_total.setText(Integer.toString(total));
+ 
+ }
+ }
+ } 
+ 
+ 
+ } 
+ private void tambahActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ 
+ if(faktur.getText().equals("") ||kode_barang.getText().equals("") || 
+pilihbarang.getSelectedItem().equals("")|| harga_satuan.getText().equals("")|| Jumlah_jual.getText().equals("")|| 
+text_total.getText().equals("")){
+ JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ 
+ }else{
+ String kdbarangg = kode_barang.getText();
+ String pilihbarangg = (String)pilihbarang.getSelectedItem();
+ String hsatuann = harga_satuan.getText();
+ String tjumlahh = Jumlah_jual.getText();
+ String totall = text_total.getText();
+ 
+ try {
+ Connection c = Koneksi.getKoneksi();
+ 
+ String sql = "INSERT INTO tb_hitung_jual VALUES (?, ?, ?, ?, ?, ?)";
+ 
+ 
+ PreparedStatement p = c.prepareStatement(sql);
+ p.setString(1, null);
+ p.setString(2, kdbarangg);
+ p.setString(3, pilihbarangg);
+ p.setString(4, hsatuann);
+ p.setString(5, tjumlahh);
+ p.setString(6, totall);
+ 
+ p.executeUpdate();
+ p.close();
+ } catch (SQLException e) {
+ System.out.println("Terjadi Error");
+ } finally {
+ nofaktur();
+ kode_barang.setText("");
+ pilihbarang.setSelectedItem("");
+ harga_satuan.setText("");
+ Jumlah_jual.setText("");
+ text_total.setText("");
+ JOptionPane.showMessageDialog(null, "Data berhasil disimpan", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ loadData();
+ 
+ 
+ }
+ }
+ } 
+ private void tabelMouseClicked(java.awt.event.MouseEvent evt) { 
+ // TODO add your handling code here:
+ int jawaban;
+ if ((jawaban = JOptionPane.showConfirmDialog(null,"Yakin batal?", "Konfirmasi", 
+JOptionPane.YES_NO_OPTION)) == 0) {
+ try{
+ 
+ int i = tabel.getSelectedRow();
+ if (i == -1) {
+ return;
+ }
+ String id = (String) model.getValueAt(i, 0);
+ 
+ st = cn.createStatement();
+ st.executeUpdate("delete from tb_hitung_jual where id_tmp = '"+id+ "'");
+ 
+ nofaktur();
+ loadData();
+ }catch(Exception e){
+ e.printStackTrace();
+ }
+ }
+ } 
+ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ fmenu fb = new fmenu();
+ fb.setVisible(true);
+ this.setVisible(false);
+ } 
+ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ if(harga_satuan.getText().equals("") ||faktur.getText().equals("")){
+ JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ 
+ }else{
+ String a = faktur.getText();
+ int ab = Integer.parseInt(String.valueOf(faktur.getText()));
+ if(ab < 0){
+ JOptionPane.showMessageDialog(null, "Uang anda kurang", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ harga_satuan.setText("");
+ faktur.setText("");
+ }else{
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT * FROM tb_hitung_jual";
+ ResultSet r = s.executeQuery(sql);
+ while (r.next()) {
+ long millis=System.currentTimeMillis(); 
+ java.sql.Date date=new java.sql.Date(millis); 
+ System.out.println(date); 
+ String tgl = date.toString();
+ String sqla = "INSERT INTO tb_penjualan VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+ 
+ PreparedStatement p = c.prepareStatement(sqla);
+ p.setString(1, faktur.getText());
+ p.setString(2, r.getString("kd_barang"));
+ p.setString(3, r.getString("nama_barang"));
+ p.setString(4, r.getString("hsatuan"));
+ p.setString(5, r.getString("jumlah_beli"));
+ p.setString(6, r.getString("harga"));
+ p.setString(7, harga_satuan.getText());
+ p.setString(8, faktur.getText());
+ p.setString(9, tgl);
+ 
+ p.executeUpdate();
+ p.close();
+ 
+ 
+ }
+ r.close();
+ s.close();
+ } catch (SQLException e) {
+ System.out.println("Terjadi Error");
+ }finally{
+ try {
+ String sqla ="TRUNCATE tb_hitung_jual";
+ java.sql.Connection conn=(Connection)Koneksi.getKoneksi();
+ java.sql.PreparedStatement pst=conn.prepareStatement(sqla);
+ pst.execute();
+ JOptionPane.showMessageDialog(null, "TRANSAKSI SELESAI", "Aplikasi Penjualan", 
+JOptionPane.INFORMATION_MESSAGE);
+ loadData();
+ kode_barang.setText(faktur.getText());
+ harga_satuan.setText("");
+ faktur.setText("");
+ jLabel4.setText("");
+ nofaktur();
+ cetak.setEnabled(true);
+ } catch (Exception e) {
+ JOptionPane.showMessageDialog(this, e.getMessage());
+ }
+ }
+ }
+ }
+ } 
+ private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ //
+ 
+ try {
+ Connection c = Koneksi.getKoneksi();
+ Statement s = c.createStatement();
+ String sql = "SELECT SUM(`harga`) AS total FROM tb_hitung_jual";
+ ResultSet r = s.executeQuery(sql);
+ 
+ while (r.next()) {
+ jLabel4.setText(r.getString(""+"total"));
+ 
+ }
+ r.close();
+ s.close();
+ } catch (SQLException e) {
+ System.out.println("Terjadi Error");
+ }
+ 
+ 
+ 
+ } 
+ private void jTextField3KeyReleased(java.awt.event.KeyEvent evt) { 
+ // TODO add your handling code here:
+ 
+ bayar = Integer.parseInt(String.valueOf(harga_satuan.getText()));
+ total = Integer.parseInt(String.valueOf(jLabel4.getText()));
+ kembali = bayar - total;
+ 
+ faktur.setText(Long.toString(kembali));
+ } 
+ private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ try{
+ Desktop.getDesktop().browse(new 
+URL("http://localhost/PenjualanBarang/invoice.php?lap&fk="+kode_barang.getText()+"").toURI());
+ } catch (Exception e){
+ System.out.println(e);
+ }
+ } 
+ private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ 
+ } 
+ private void jTextField3KeyTyped(java.awt.event.KeyEvent evt) { 
+ // TODO add your handling code here:
+ FilterAngka(evt);
+ } 
+ private void ttotalActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ } 
+ private void tjumlahKeyTyped(java.awt.event.KeyEvent evt) { 
+ // TODO add your handling code here:
+ FilterAngka(evt);
+ } 
+ private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) { 
+ // TODO add your handling code here:
+ } 
+ /**
+ * @param args the command line arguments
+ */
+ public static void main(String args[]) {
+ /* Set the Nimbus look and feel */
+ //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+ /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+ * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+ */
+ try {
+ for (javax.swing.UIManager.LookAndFeelInfo info : 
+javax.swing.UIManager.getInstalledLookAndFeels()) {
+ if ("Nimbus".equals(info.getName())) {
+ javax.swing.UIManager.setLookAndFeel(info.getClassName());
+ break;
+ }
+ }
+ } catch (ClassNotFoundException ex) {
+ java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, 
+null, ex);
+ } catch (InstantiationException ex) {
+ java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, 
+null, ex);
+ } catch (IllegalAccessException ex) {
+ java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, 
+null, ex);
+ } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+ java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, 
+null, ex);
+ }
+ //</editor-fold>
+ /* Create and display the form */
+ java.awt.EventQueue.invokeLater(new Runnable() {
+ public void run() {
+ new fpenjualan().setVisible(true);
+ }
+ });
+ }
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void bt_kembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_kembaliActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+        fmenu fb = new fmenu();
+ fb.setVisible(true);
+ this.setVisible(false);
+    }//GEN-LAST:event_bt_kembaliActionPerformed
+
+    private void cetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakActionPerformed
+        // TODO add your handling code here:
+        try{
+ Desktop.getDesktop().browse(new 
+URL("http://localhost/PenjualanBarang/invoice.php?lap&fk="+kode_barang.getText()+"").toURI());
+ } catch (Exception e){
+ System.out.println(e);
+ }
+    }//GEN-LAST:event_cetakActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(fpenjualan.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new fpenjualan().setVisible(true);
-            }
-        });
-    }
+  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JTextField Jumlah_jual;
+    private javax.swing.JButton bt_kembali;
+    private javax.swing.JButton bt_total;
+    private javax.swing.JButton cetak;
+    private javax.swing.JTextField faktur;
+    private javax.swing.JTextField harga_satuan;
+    private javax.swing.JButton hitung;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -348,13 +737,13 @@ public class fpenjualan extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
+    private javax.swing.JTextField kode_barang;
+    private javax.swing.JComboBox<String> pilihbarang;
+    private javax.swing.JButton selesai;
+    private javax.swing.JTable tabel;
+    private javax.swing.JButton tambah;
+    private javax.swing.JTextField text_bayar;
+    private javax.swing.JTextField text_kembalian;
+    private javax.swing.JTextField text_total;
     // End of variables declaration//GEN-END:variables
 }
