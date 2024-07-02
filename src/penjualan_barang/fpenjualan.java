@@ -112,7 +112,7 @@ private void nofaktur(){
             String sql = "SELECT * FROM tb_penjualan ORDER by no_faktur desc";
             ResultSet r = s.executeQuery(sql);
             if (r.next()) {
-                String nofak = r.getString("nofaktur").substring(1);
+                String nofak = r.getString("no_faktur").substring(1);
                 String AN = "" + (Integer.parseInt(nofak) + 1);
                 String Nol = "";
                 if (AN.length() == 1) {
@@ -267,6 +267,17 @@ private void nofaktur(){
         cetak.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cetakActionPerformed(evt);
+            }
+        });
+
+        text_bayar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                text_bayarActionPerformed(evt);
+            }
+        });
+        text_bayar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                text_bayarKeyReleased(evt);
             }
         });
 
@@ -636,25 +647,6 @@ private void nofaktur(){
     }
 
 
-    private void jTextField3KeyReleased(java.awt.event.KeyEvent evt) {
-        // TODO add your handling code here:
-
-        bayar = Integer.parseInt(String.valueOf(harga_satuan.getText()));
-        total = Integer.parseInt(String.valueOf(jLabel4.getText()));
-        kembali = bayar - total;
-
-        faktur.setText(Long.toString(kembali));
-    }
-
-    private void bt_totalKeyReleased(java.awt.event.KeyEvent evt) {
-        // TODO add your handling code here:
-
-        bayar = Integer.parseInt(String.valueOf(harga_satuan.getText()));
-        total = Integer.parseInt(String.valueOf(jLabel4.getText()));
-        kembali = bayar - total;
-
-        faktur.setText(Long.toString(kembali));
-    }
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
@@ -885,8 +877,91 @@ private void nofaktur(){
 
     private void selesaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selesaiActionPerformed
         // TODO add your handling code here:
-        
+        if (text_bayar.getText().equals("") || text_kembalian.getText().equals("")) {
+            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } else {
+            String a = text_kembalian.getText();
+            int ab = Integer.parseInt(String.valueOf(text_kembalian.getText()));
+            if (ab < 0) {
+                JOptionPane.showMessageDialog(null, "Uang anda kurang", "Aplikasi Penjualan",
+                        JOptionPane.INFORMATION_MESSAGE);
+                text_bayar.setText("");
+                text_kembalian.setText("");
+            } else {
+                try {
+                    Connection c = Koneksi.getKoneksi();
+                    Statement s = c.createStatement();
+                    String sql = "SELECT * FROM tb_hitung_jual";
+                    ResultSet r = s.executeQuery(sql);
+                    while (r.next()) {
+                        long millis = System.currentTimeMillis();
+                        java.sql.Date date = new java.sql.Date(millis);
+                        System.out.println(date);
+                        String tgl = date.toString();
+                        String sqla = "INSERT INTO tb_penjualan (no_faktur, kode_barang, nama_barang, hsatuan, jumlah_jual, harga, bayar, kembalian, tanggal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                        PreparedStatement p = c.prepareStatement(sqla);
+                        p.setString(1, faktur.getText());
+                        p.setString(2, r.getString("kode_barang"));
+                        p.setString(3, r.getString("nama_barang"));
+                        p.setString(4, r.getString("hsatuan"));
+                        p.setString(5, r.getString("jumlah_jual"));
+                        p.setString(6, r.getString("harga"));
+                        p.setString(7, text_bayar.getText());
+                        p.setString(8, text_kembalian.getText());
+                        p.setString(9, tgl);
+
+                        p.executeUpdate();
+                        p.close();
+
+                    }
+                    r.close();
+                    s.close();
+                } catch (SQLException e) {
+                    System.out.println(e);
+                } finally {
+                    try {
+                        String sqla = "TRUNCATE tb_hitung_jual";
+                        java.sql.Connection conn = (Connection) Koneksi.getKoneksi();
+                        java.sql.PreparedStatement pst = conn.prepareStatement(sqla);
+                        pst.execute();
+                        JOptionPane.showMessageDialog(null, "TRANSAKSI SELESAI", "Aplikasi Penjualan",
+                                JOptionPane.INFORMATION_MESSAGE);
+                        loadData();
+                        kode_barang.setText(text_kembalian.getText());
+                        harga_satuan.setText("");
+                        text_kembalian.setText("");
+                        jLabel11.setText("");
+                        nofaktur();
+                        cetak.setEnabled(true);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(this, e.getMessage());
+                    }
+                }
+            }
+        }
     }//GEN-LAST:event_selesaiActionPerformed
+
+    private void text_bayarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_text_bayarActionPerformed
+        // TODO add your handling code here:
+         bayar = Integer.parseInt(String.valueOf(text_bayar.getText()));
+        total = Integer.parseInt(String.valueOf(jLabel11.getText()));
+        kembali = bayar - total;
+
+        text_kembalian.setText(Long.toString(kembali));
+        
+    }//GEN-LAST:event_text_bayarActionPerformed
+
+    private void text_bayarKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_text_bayarKeyReleased
+        // TODO add your handling code here:
+         bayar = Integer.parseInt(String.valueOf(text_bayar.getText()));
+        total = Integer.parseInt(String.valueOf(jLabel11.getText()));
+        kembali = bayar - total;
+
+        text_kembalian.setText(Long.toString(kembali));
+    }//GEN-LAST:event_text_bayarKeyReleased
 
     /**
      * @param args the command line arguments
