@@ -27,7 +27,7 @@ private DefaultTableModel model;
         initComponents();
 model = new DefaultTableModel();
 tabelinput.setModel(model);
-model.addColumn("kd_barang");
+model.addColumn("kode_barang");
 model.addColumn("nama_barang");
 model.addColumn("jumlah_barang");
 model.addColumn("harga_beli");
@@ -67,10 +67,10 @@ private void kode() {
 try {
 Connection c = Koneksi.getKoneksi();
 Statement s = c.createStatement();
-String sql = "SELECT * FROM tb_barang ORDER by kd_barang desc";
+String sql = "SELECT * FROM tb_barang ORDER by kode_barang desc";
 ResultSet r = s.executeQuery(sql);
 if (r.next()) {
-String nofak = r.getString("kd_barang").substring(1);
+String nofak = r.getString("kode_barang").substring(1);
 String AN = "" + (Integer.parseInt(nofak) + 1);
 String Nol = "";
 if (AN.length() == 1) {
@@ -105,7 +105,7 @@ this.setVisible(false);
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        bt_back = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -131,7 +131,12 @@ this.setVisible(false);
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("Pengolahan data barang");
 
-        jButton1.setText("back");
+        bt_back.setText("back");
+        bt_back.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_backActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Kode barang");
 
@@ -238,7 +243,7 @@ this.setVisible(false);
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(btn_edit))))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jButton1)
+                        .addComponent(bt_back)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
@@ -267,7 +272,7 @@ this.setVisible(false);
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jButton1))
+                    .addComponent(bt_back))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -479,6 +484,14 @@ txt_hargajual.setText(hjual);
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_cariActionPerformed
 
+    private void bt_backActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_backActionPerformed
+        // TODO add your handling code here:
+                fmenu fb = new fmenu();
+ fb.setVisible(true);
+ this.setVisible(false);
+    
+    }//GEN-LAST:event_bt_backActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -515,10 +528,10 @@ txt_hargajual.setText(hjual);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bt_back;
     private javax.swing.JButton btn_edit;
     private javax.swing.JButton btn_hapus;
     private javax.swing.JButton btn_simpan;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

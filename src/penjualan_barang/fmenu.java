@@ -14,12 +14,7 @@ public class fmenu extends javax.swing.JFrame {
     /**
      * Creates new form fmenu
      */        
-    private void barangActionPerformed(java.awt.event.ActionEvent evt) { 
-// Untuk memanggil form barang pada menu:
-fbarang fb = new fbarang();
-fb.setVisible(true);
-this.setVisible(false); 
-}
+
     public fmenu() {
         initComponents();
     }
@@ -35,11 +30,11 @@ this.setVisible(false);
 
         jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        pegawai = new javax.swing.JMenu();
-        barang = new javax.swing.JMenu();
+        menu_pegawai = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        penjualan = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         Lpenjualan = new javax.swing.JMenu();
         jMenu8 = new javax.swing.JMenu();
@@ -49,20 +44,35 @@ this.setVisible(false);
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel1.setText("PT.PTan");
 
-        jMenu1.setText("Master");
+        menu_pegawai.setText("Master");
 
-        pegawai.setText("Pegawai");
-        jMenu1.add(pegawai);
+        jMenuItem1.setText("Pegawai");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        menu_pegawai.add(jMenuItem1);
 
-        barang.setText("Barang");
-        jMenu1.add(barang);
+        jMenuItem2.setText("Barang");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        menu_pegawai.add(jMenuItem2);
 
-        jMenuBar1.add(jMenu1);
+        jMenuBar1.add(menu_pegawai);
 
         jMenu2.setText("Transaksi");
 
-        penjualan.setText("Penjualan");
-        jMenu2.add(penjualan);
+        jMenuItem3.setText("Penjualan");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem3);
 
         jMenuBar1.add(jMenu2);
 
@@ -98,6 +108,36 @@ this.setVisible(false);
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        fpegawai fpeg = new fpegawai();
+        fpeg.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+         fbarang fb = new fbarang();
+        fb.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        fpenjualan fpen = new fpenjualan();
+        fpen.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+                                                                                                                       
+    private void jMenu2ActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        // TODO add your handling code here:
+        fpenjualan fpen = new fpenjualan();
+        fpen.setVisible(true);
+        this.setVisible(false);
+    }                                          
+
+                                     
+
     /**
      * @param args the command line arguments
      */
@@ -131,19 +171,22 @@ this.setVisible(false);
                 new fmenu().setVisible(true);
             }
         });
-
     }
+    /**
+     * @param args the command line arguments
+     */
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu Lpenjualan;
-    private javax.swing.JMenu barang;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenu pegawai;
-    private javax.swing.JMenu penjualan;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenu menu_pegawai;
     // End of variables declaration//GEN-END:variables
 }
