@@ -10,6 +10,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+
 import java.awt.Desktop;
 import java.net.URL;
 import java.sql.*;
@@ -544,15 +545,31 @@ private void nofaktur(){
       try {
         // Definisi nama file PDF
         String filePath = "invoice_pembelian.pdf";
+        long millis = System.currentTimeMillis();
+        java.sql.Date date = new java.sql.Date(millis);
+        String tanggal= date.toString();
 
         // Inisialisasi objek Dokumen PDF
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream(filePath));
         document.open();
 
+        // Membuat paragraf dengan teks
+            Paragraph Judul = new Paragraph("Invoice Pembelian");
+             Paragraph pt = new Paragraph("PT.PTan");
+
+            // Mengatur alignment paragraf ke center
+            Judul.setAlignment(Paragraph.ALIGN_CENTER);
+            pt.setAlignment(Paragraph.ALIGN_CENTER);
+        
         // Menambahkan judul
-        document.add(new Paragraph("Invoice Pembelian"));
+        document.add(Judul);
         document.add(Chunk.NEWLINE); // Baris baru (newline) atau
+        document.add(pt);
+        document.add(Chunk.NEWLINE);
+        document.add(new Paragraph("No Faktur:" + faktur.getText()));
+        document.add(new Paragraph("Tanggal:" + tanggal));
+        document.add(Chunk.NEWLINE);
 
         // Membuat tabel untuk data penjualan
         com.itextpdf.text.pdf.PdfPTable pdfTable = new com.itextpdf.text.pdf.PdfPTable(model.getColumnCount());
@@ -574,9 +591,9 @@ private void nofaktur(){
         
          // Menambahkan total pendapatan ke dokumen PDF
         document.add(new Paragraph("Total harga: " + jLabel11.getText()));
-        document.add(Chunk.NEWLINE);
+        
         document.add(new Paragraph("Di bayar : " + text_bayar.getText()));
-        document.add(Chunk.NEWLINE);
+       
         document.add(new Paragraph("Kembalian: " + text_kembalian.getText()));
         
         document.close();
