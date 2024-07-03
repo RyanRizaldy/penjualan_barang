@@ -128,7 +128,7 @@ JOptionPane.showMessageDialog(null, "username and password required !!");
 try {
 java.sql.Connection conn = (java.sql.Connection) Koneksi.getKoneksi();
 java.sql.Statement stm = conn.createStatement();
-java.sql.ResultSet sql = stm.executeQuery("select * from tbl_login where username='" + txt_username.getText() + "' and password = '" + txt_password.getText() + "'");
+java.sql.ResultSet sql = stm.executeQuery("select * from tb_akun where username='" + txt_username.getText() + "' and password = '" + txt_password.getText() + "'");
 if (sql.next()) {
 if (txt_password.getText().equals(sql.getString("password"))) {
 JOptionPane.showMessageDialog(null, "login berhasil");

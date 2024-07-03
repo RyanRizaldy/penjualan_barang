@@ -209,7 +209,7 @@ private void nofaktur(){
 
         jLabel6.setText("Jumlah jual");
 
-        pilihbarang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        pilihbarang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pilih " }));
         pilihbarang.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pilihbarangActionPerformed(evt);
@@ -449,124 +449,6 @@ private void nofaktur(){
         
     }
 
-    private void test2ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-        if (pilihbarang.getSelectedItem().equals("pilih barang")) {
-            kode_barang.setText("");
-            harga_satuan.setText("");
-        } else {
-            try {
-                Connection c = Koneksi.getKoneksi();
-                Statement s = c.createStatement();
-                String sql = "SELECT kode_barang, jumlah_barang FROM tb_barang WHERE nama_barang ='"
-                        + pilihbarang.getSelectedItem() + "'";
-                ResultSet r = s.executeQuery(sql);
-                while (r.next()) {
-                    kode_barang.setText(r.getString("kode_barang"));
-                    ttotal.setText(r.getString("jumlah_barang"));
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, e);
-            }
-            try {
-                Connection c = Koneksi.getKoneksi();
-                Statement s = c.createStatement();
-                String sql = "SELECT harga_jual FROM tb_barang WHERE nama_barang ='"
-                        + pilihbarang.getSelectedItem() + "'";
-                ResultSet r = s.executeQuery(sql);
-                while (r.next()) {
-                    harga_satuan.setText(r.getString("harga_jual"));
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, e);
-            }
-        }
-    }
-
-    private void testActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-        if (faktur.getText().equals("") || kode_barang.getText().equals("")
-                || pilihbarang.getSelectedItem().equals("") || harga_satuan.getText().equals("") || tjumlah.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-        } else {
-            String a = tjumlah.getText();
-            int aa = Integer.parseInt(a);
-
-            String b = ttotal.getText();
-            int bb = Integer.parseInt(b);
-            if (aa > bb) {
-                JOptionPane.showMessageDialog(null, "jumlah melebihi stok", "Aplikasi Penjualan",
-                        JOptionPane.INFORMATION_MESSAGE);
-                tjumlah.setText("");
-            } else {
-
-                if (tjumlah.getText().equals("")) {
-                    JOptionPane.showMessageDialog(null, "ISI JUMLAH BELI !");
-                } else {
-                    int jumlah, harga, total;
-
-                    jumlah = Integer.parseInt(tjumlah.getText().toString());
-                    harga = Integer.parseInt(harga_satuan.getText().toString());
-                    total = jumlah * harga;
-
-                    ttotal.setText(Integer.toString(total));
-
-                }
-            }
-        }
-
-    }
-
-    private void test3ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-
-        if (faktur.getText().equals("") || kode_barang.getText().equals("")
-                || pilihbarang.getSelectedItem().equals("") || harga_satuan.getText().equals("") || tjumlah.getText().equals("")
-                || ttotal.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-        } else {
-            String kdbarangg = kode_barang.getText();
-            String pilihbarangg = (String) pilihbarang.getSelectedItem();
-            String hsatuann = harga_satuan.getText();
-            String tjumlahh = tjumlah.getText();
-            String totall = ttotal.getText();
-
-            try {
-                Connection c = Koneksi.getKoneksi();
-
-                String sql = "INSERT INTO tb_hitung_jual VALUES (?, ?, ?, ?, ?, ?)";
-
-                PreparedStatement p = c.prepareStatement(sql);
-                p.setString(1, null);
-                p.setString(2, kdbarangg);
-                p.setString(3, pilihbarangg);
-                p.setString(4, hsatuann);
-                p.setString(5, tjumlahh);
-                p.setString(6, totall);
-
-                p.executeUpdate();
-                p.close();
-            } catch (SQLException e) {
-                System.out.println("Terjadi Error");
-            } finally {
-                nofaktur();
-                kode_barang.setText("");
-                pilihbarang.setSelectedItem("");
-                harga_satuan.setText("");
-                tjumlah.setText("");
-                ttotal.setText("");
-                JOptionPane.showMessageDialog(null, "Data berhasil disimpan", "Aplikasi Penjualan",
-                        JOptionPane.INFORMATION_MESSAGE);
-                loadData();
-
-            }
-        }
-    }
-
     
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -577,85 +459,8 @@ private void nofaktur(){
     }
     //jButton1
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-        if (harga_satuan.getText().equals("") || faktur.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "Aplikasi Penjualan",
-                    JOptionPane.INFORMATION_MESSAGE);
+ 
 
-        } else {
-            String a = faktur.getText();
-            int ab = Integer.parseInt(String.valueOf(faktur.getText()));
-            if (ab < 0) {
-                JOptionPane.showMessageDialog(null, "Uang anda kurang", "Aplikasi Penjualan",
-                        JOptionPane.INFORMATION_MESSAGE);
-                harga_satuan.setText("");
-                faktur.setText("");
-            } else {
-                try {
-                    Connection c = Koneksi.getKoneksi();
-                    Statement s = c.createStatement();
-                    String sql = "SELECT * FROM tb_hitung_jual";
-                    ResultSet r = s.executeQuery(sql);
-                    while (r.next()) {
-                        long millis = System.currentTimeMillis();
-                        java.sql.Date date = new java.sql.Date(millis);
-                        System.out.println(date);
-                        String tgl = date.toString();
-                        String sqla = "INSERT INTO tb_penjualan VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-                        PreparedStatement p = c.prepareStatement(sqla);
-                        p.setString(1, faktur.getText());
-                        p.setString(2, r.getString("kode_barang"));
-                        p.setString(3, r.getString("nama_barang"));
-                        p.setString(4, r.getString("hsatuan"));
-                        p.setString(5, r.getString("jumlah_beli"));
-                        p.setString(6, r.getString("harga"));
-                        p.setString(7, harga_satuan.getText());
-                        p.setString(8, faktur.getText());
-                        p.setString(9, tgl);
-
-                        p.executeUpdate();
-                        p.close();
-
-                    }
-                    r.close();
-                    s.close();
-                } catch (SQLException e) {
-                    System.out.println("Terjadi Error");
-                } finally {
-                    try {
-                        String sqla = "TRUNCATE tb_hitung_jual";
-                        java.sql.Connection conn = (Connection) Koneksi.getKoneksi();
-                        java.sql.PreparedStatement pst = conn.prepareStatement(sqla);
-                        pst.execute();
-                        JOptionPane.showMessageDialog(null, "TRANSAKSI SELESAI", "Aplikasi Penjualan",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        loadData();
-                        kode_barang.setText(faktur.getText());
-                        harga_satuan.setText("");
-                        faktur.setText("");
-                        jLabel4.setText("");
-                        nofaktur();
-                        cetak.setEnabled(true);
-                    } catch (Exception e) {
-                        JOptionPane.showMessageDialog(this, e.getMessage());
-                    }
-                }
-            }
-        }
-    }
-
-
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
-        try {
-            Desktop.getDesktop().browse(new URL("http://localhost/PenjualanBarang/invoice.php?lap&fk=" + kode_barang.getText() + "").toURI());
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
@@ -729,7 +534,7 @@ private void nofaktur(){
     private void cetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakActionPerformed
         // TODO add your handling code here:
         try {
-            Desktop.getDesktop().browse(new URL("http://localhost/PenjualanBarang/invoice.php?lap&fk=" + kode_barang.getText() + "").toURI());
+            Desktop.getDesktop().browse(new URL("http://localhost/penjualan/invoice.php?lap&fk=" + kode_barang.getText() + "").toURI());
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -739,14 +544,14 @@ private void nofaktur(){
         // TODO add your handling code here:
        if (faktur.getText().equals("") || kode_barang.getText().equals("") || pilihbarang.getSelectedItem().equals("") || harga_satuan.getText().equals("")
                 || tjumlah.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "PT.Angin Ribut", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "PT.PTan", JOptionPane.INFORMATION_MESSAGE);
         } else {
             String a = tjumlah.getText();
             int aa = Integer.parseInt(a);
             String b = jumlah.getText();
             int bb = Integer.parseInt(b);
             if (aa > bb) {
-                JOptionPane.showMessageDialog(null, "jumlah melebihi stok", "PT. Angin Ribut", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "jumlah melebihi stok", "PT.PTan", JOptionPane.INFORMATION_MESSAGE);
                 tjumlah.setText("");
             } else {
                 if (tjumlah.getText().equals("")) {
@@ -799,7 +604,7 @@ private void nofaktur(){
         // TODO add your handling code here:
         if (faktur.getText().equals("") || kode_barang.getText().equals("") || pilihbarang.getSelectedItem().equals("") || harga_satuan.getText().equals("")
                 || tjumlah.getText().equals("") || ttotal.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "PT. Angin Ribut", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "LENGKAPI DATA !", "PT.PTan", JOptionPane.INFORMATION_MESSAGE);
         } else {
             String kdbarangg = kode_barang.getText();
             String pilihbarangg = (String) pilihbarang.getSelectedItem();
@@ -829,7 +634,7 @@ private void nofaktur(){
                 harga_satuan.setText("");
                 tjumlah.setText("");
                 ttotal.setText("");
-                JOptionPane.showMessageDialog(null, "Data berhasil disimpan", "PT. Angin Ribut", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Data berhasil disimpan", "PT.PTan", JOptionPane.INFORMATION_MESSAGE);
                 loadData();
      }
 }
