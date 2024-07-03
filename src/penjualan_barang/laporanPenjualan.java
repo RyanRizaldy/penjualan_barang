@@ -5,6 +5,7 @@
  */
 package penjualan_barang;
 
+import com.itextpdf.text.Chunk;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +15,16 @@ import java.sql.Statement;
 import javax.swing.ButtonGroup;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.awt.Desktop;
+import javax.swing.JOptionPane;
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
@@ -103,6 +114,7 @@ public class laporanPenjualan extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         hitung = new javax.swing.JButton();
+        pdf = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -151,6 +163,13 @@ public class laporanPenjualan extends javax.swing.JFrame {
             }
         });
 
+        pdf.setText("Download Pdf");
+        pdf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pdfActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -171,7 +190,9 @@ public class laporanPenjualan extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(pilih, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(harga_satuan))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pdf)
+                .addGap(47, 47, 47))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -186,14 +207,19 @@ public class laporanPenjualan extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(back))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(pilih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(harga_satuan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(pilih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(harga_satuan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(pdf)))
                 .addGap(12, 12, 12)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -266,6 +292,60 @@ public class laporanPenjualan extends javax.swing.JFrame {
 
     jLabel5.setText(String.valueOf(totalPendapatan));
     }//GEN-LAST:event_hitungActionPerformed
+
+    private void pdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pdfActionPerformed
+        // TODO add your handling code here:
+      try {
+        // Definisi nama file PDF
+        String filePath = "laporan_penjualan.pdf";
+
+        // Inisialisasi objek Dokumen PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
+        document.open();
+
+        // Menambahkan judul
+        document.add(new Paragraph("Laporan Penjualan"));
+        document.add(Chunk.NEWLINE); // Baris baru (newline) atau
+
+        // Membuat tabel untuk data penjualan
+        com.itextpdf.text.pdf.PdfPTable pdfTable = new com.itextpdf.text.pdf.PdfPTable(model.getColumnCount());
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            pdfTable.addCell(model.getColumnName(i));
+        }
+
+        // Menambahkan data dari tabel model ke tabel PDF
+        for (int row = 0; row < model.getRowCount(); row++) {
+            for (int col = 0; col < model.getColumnCount(); col++) {
+                pdfTable.addCell(model.getValueAt(row, col).toString());
+            }
+        }
+
+        // Menambahkan tabel ke dokumen PDF
+        document.add(pdfTable);
+        
+        document.add(Chunk.NEWLINE); // Baris baru (newline) atau
+        
+         // Menambahkan total pendapatan ke dokumen PDF
+        document.add(new Paragraph("Total Pendapatan: " + jLabel5.getText()));
+        
+        document.close();
+
+        // Memberitahu pengguna bahwa PDF telah berhasil dibuat
+        JOptionPane.showMessageDialog(null, "PDF telah berhasil dibuat: " + filePath);
+
+        // Membuka file PDF di default PDF viewer
+        File file = new File(filePath);
+        if (file.exists()) {
+            Desktop.getDesktop().open(file);
+        } else {
+            JOptionPane.showMessageDialog(null, "File PDF tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (DocumentException | IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Terjadi kesalahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_pdfActionPerformed
     
     
 
@@ -314,6 +394,7 @@ public class laporanPenjualan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton pdf;
     private javax.swing.JComboBox<String> pilih;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables

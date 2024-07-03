@@ -5,6 +5,15 @@
  */
 package penjualan_barang;
 
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -93,6 +102,7 @@ public class stokBarang extends javax.swing.JFrame {
         table = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         pilih = new javax.swing.JComboBox<>();
+        pdf = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -128,6 +138,13 @@ public class stokBarang extends javax.swing.JFrame {
             }
         });
 
+        pdf.setText("Download Pdf");
+        pdf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pdfActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -138,9 +155,12 @@ public class stokBarang extends javax.swing.JFrame {
                 .addComponent(back))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pilih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pilih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pdf))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -153,7 +173,9 @@ public class stokBarang extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(pilih, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addComponent(pdf)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -202,6 +224,57 @@ public class stokBarang extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_backActionPerformed
 
+    private void pdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pdfActionPerformed
+        // TODO add your handling code here:
+         try {
+        // Definisi nama file PDF
+        String filePath = "laporan_Stok_barang.pdf";
+
+        // Inisialisasi objek Dokumen PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
+        document.open();
+
+        // Menambahkan judul
+        document.add(new Paragraph("Laporan Stok Barang"));
+        document.add(Chunk.NEWLINE); // Baris baru (newline) atau
+
+        // Membuat tabel untuk data penjualan
+        com.itextpdf.text.pdf.PdfPTable pdfTable = new com.itextpdf.text.pdf.PdfPTable(model.getColumnCount());
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            pdfTable.addCell(model.getColumnName(i));
+        }
+
+        // Menambahkan data dari tabel model ke tabel PDF
+        for (int row = 0; row < model.getRowCount(); row++) {
+            for (int col = 0; col < model.getColumnCount(); col++) {
+                pdfTable.addCell(model.getValueAt(row, col).toString());
+            }
+        }
+
+        // Menambahkan tabel ke dokumen PDF
+        document.add(pdfTable);
+        
+        
+        
+        document.close();
+
+        // Memberitahu pengguna bahwa PDF telah berhasil dibuat
+        JOptionPane.showMessageDialog(null, "PDF telah berhasil dibuat: " + filePath);
+
+        // Membuka file PDF di default PDF viewer
+        File file = new File(filePath);
+        if (file.exists()) {
+            Desktop.getDesktop().open(file);
+        } else {
+            JOptionPane.showMessageDialog(null, "File PDF tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (DocumentException | IOException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Terjadi kesalahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_pdfActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -242,6 +315,7 @@ public class stokBarang extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton pdf;
     private javax.swing.JComboBox<String> pilih;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables

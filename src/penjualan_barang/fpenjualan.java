@@ -533,11 +533,24 @@ private void nofaktur(){
 
     private void cetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakActionPerformed
         // TODO add your handling code here:
-        try {
-            Desktop.getDesktop().browse(new URL("http://localhost/penjualan/invoice.php?lap&fk=" + kode_barang.getText() + "").toURI());
-        } catch (Exception e) {
-            System.out.println(e);
+     try {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+            String kodeBarang = kode_barang.getText();
+            if (kodeBarang != null && !kodeBarang.isEmpty()) {
+                String urlString = "http://localhost/penjualan/invoice.php?lap&fk=" + kodeBarang;
+                System.out.println("Trying to open URL: " + urlString);
+                URL url = new URL(urlString);
+                Desktop.getDesktop().browse(url.toURI());
+            } else {
+                JOptionPane.showMessageDialog(this, "Kode barang tidak boleh kosong!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Desktop API tidak didukung pada sistem ini!", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Terjadi kesalahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
     }//GEN-LAST:event_cetakActionPerformed
 
     private void hitungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hitungActionPerformed
