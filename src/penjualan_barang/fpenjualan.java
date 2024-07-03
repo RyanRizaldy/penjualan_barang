@@ -5,12 +5,20 @@
  */
 package penjualan_barang;
 
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.Desktop;
 import java.net.URL;
 import java.sql.*;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  *
@@ -533,23 +541,59 @@ private void nofaktur(){
 
     private void cetakActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cetakActionPerformed
         // TODO add your handling code here:
-     try {
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-            String kodeBarang = kode_barang.getText();
-            if (kodeBarang != null && !kodeBarang.isEmpty()) {
-                String urlString = "http://localhost/penjualan/invoice.php?lap&fk=" + kodeBarang;
-                System.out.println("Trying to open URL: " + urlString);
-                URL url = new URL(urlString);
-                Desktop.getDesktop().browse(url.toURI());
-            } else {
-                JOptionPane.showMessageDialog(this, "Kode barang tidak boleh kosong!", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Desktop API tidak didukung pada sistem ini!", "Error", JOptionPane.ERROR_MESSAGE);
+      try {
+        // Definisi nama file PDF
+        String filePath = "invoice_pembelian.pdf";
+
+        // Inisialisasi objek Dokumen PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
+        document.open();
+
+        // Menambahkan judul
+        document.add(new Paragraph("Invoice Pembelian"));
+        document.add(Chunk.NEWLINE); // Baris baru (newline) atau
+
+        // Membuat tabel untuk data penjualan
+        com.itextpdf.text.pdf.PdfPTable pdfTable = new com.itextpdf.text.pdf.PdfPTable(model.getColumnCount());
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            pdfTable.addCell(model.getColumnName(i));
         }
-    } catch (Exception e) {
+
+        // Menambahkan data dari tabel model ke tabel PDF
+        for (int row = 0; row < model.getRowCount(); row++) {
+            for (int col = 0; col < model.getColumnCount(); col++) {
+                pdfTable.addCell(model.getValueAt(row, col).toString());
+            }
+        }
+
+        // Menambahkan tabel ke dokumen PDF
+        document.add(pdfTable);
+        
+        document.add(Chunk.NEWLINE); // Baris baru (newline) atau
+        
+         // Menambahkan total pendapatan ke dokumen PDF
+        document.add(new Paragraph("Total harga: " + jLabel11.getText()));
+        document.add(Chunk.NEWLINE);
+        document.add(new Paragraph("Di bayar : " + text_bayar.getText()));
+        document.add(Chunk.NEWLINE);
+        document.add(new Paragraph("Kembalian: " + text_kembalian.getText()));
+        
+        document.close();
+
+        // Memberitahu pengguna bahwa PDF telah berhasil dibuat
+        JOptionPane.showMessageDialog(null, "PDF telah berhasil dibuat: " + filePath);
+
+        // Membuka file PDF di default PDF viewer
+        File file = new File(filePath);
+        if (file.exists()) {
+            Desktop.getDesktop().open(file);
+        } else {
+            JOptionPane.showMessageDialog(null, "File PDF tidak ditemukan!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (DocumentException | IOException e) {
         e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Terjadi kesalahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, "Terjadi kesalahan: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
     }//GEN-LAST:event_cetakActionPerformed
 
