@@ -735,7 +735,8 @@ private void nofaktur(){
                         JOptionPane.showMessageDialog(null, "TRANSAKSI SELESAI", "Aplikasi Penjualan",
                                 JOptionPane.INFORMATION_MESSAGE);
                         loadData();
-                        kode_barang.setText(text_kembalian.getText());
+                        //kode_barang.setText(text_kembalian.getText());
+                        text_bayar.setText("");
                         harga_satuan.setText("");
                         text_kembalian.setText("");
                         jLabel11.setText("");
