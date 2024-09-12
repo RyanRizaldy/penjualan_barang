@@ -1,1 +1,1 @@
-#ini text percobaan squash
+--ini text percobaan squash
