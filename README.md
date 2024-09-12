@@ -1,2 +1,3 @@
 --ini text percobaan squash
-asdasdasd
+<br>asdasdasd
+<br>asdasd
